@@ -14,7 +14,7 @@ const signinUser = async(email:string, password:string)=>{
   if(!isMatched){
     return false;
   }
-  const token = jwt.sign({name: user.name, email: user.email, role: user.role}, config.jwt_secret as string, {
+  const token = jwt.sign({id: user.id, name: user.name, email: user.email, role: user.role}, config.jwt_secret as string, {
     expiresIn: "5d"
   } );
   return {token, user:userData}

@@ -1,23 +1,16 @@
-import { NextFunction, Request, Response } from "express";
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config";
+import { NextFunction, Request, Response } from "express";
 
-const auth = (...roles: string[])=>{
+const auth = () => {
   return async (req: Request, res: Response, next: NextFunction)=>{
     try{
-      const token = req.headers.authorization;
-      console.log('Auth token', token);
-      if(!token){
-        return res.status(500).json({message: "Forbidden."});
+      const token = req.headers.authorization?.split(" ")[1];
+      if (!token) {
+        return res.status(401).json({ message: "Unauthorized" });
       }
-      const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload;
-      console.log(decoded);
+      const decoded = jwt.verify(token, config.jwt_secret!) as JwtPayload
       req.user = decoded;
-      if(roles.length && !roles.includes(decoded.role)){
-        return res.status(500).json({
-          error: "Unauthorized."
-        })
-      }
       next();
     }catch(err:any){
       res.status(500).json({
@@ -26,6 +19,6 @@ const auth = (...roles: string[])=>{
       });
     }
   }
-}
+};
 
 export default auth;

@@ -12,7 +12,7 @@ app.use(express.json());
 initDB();
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Welcome to shohoz shorol assignment.');
+  res.send('Welcome to shohoz shorol assignment 2.');
 });
 
 app.use('/api/v1', userRoutes);

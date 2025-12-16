@@ -6,17 +6,15 @@ const authAdmin = (...roles: string[])=>{
   return async (req: Request, res: Response, next: NextFunction)=>{
     try{
       const token = req.headers.authorization?.split(' ')[1];
-      console.log('Auth token', token);
       
       if(!token){
-        return res.status(500).json({message: "Forbidden."});
+        return res.status(401).json({message: "Unauthorized"});
       }
       const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload;
-      console.log(decoded);
       req.user = decoded;
       if(roles.length && !roles.includes(decoded.role)){
-        return res.status(500).json({
-          error: "Unauthorized."
+        return res.status(401).json({
+          error: "Unauthorized"
         })
       }
       next();

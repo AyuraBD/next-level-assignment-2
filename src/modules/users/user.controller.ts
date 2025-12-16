@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
 import { userServices } from "./user.services";
-import jwt from 'jsonwebtoken';
-import config from "../../config";
 
 const createUser = async(req: Request, res: Response)=>{
     const {name, email, password, phone, role} = req.body;
@@ -81,13 +79,20 @@ const updateUser = async(req: Request, res: Response)=>{
 const deleteUser = async(req: Request, res: Response)=>{
   const id = req.params.userId;
   try{
-    const result = await userServices.deleteUser(id as string);
+    const user = req.user;
+    if(Number(user?.id === Number(id))){
+      return res.status(403).json({
+        success: false,
+        message: "Admin cannot delete own account"
+      })
+    }
+    await userServices.deleteUser(id as string);
     res.status(200).json({
       success: true,
       message: 'User deleted successfully'
     })
   }catch(err:any){
-    res.status(500).json({
+    res.status(400).json({
       success: false,
       message: err.message
     })

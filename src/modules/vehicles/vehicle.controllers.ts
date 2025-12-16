@@ -26,7 +26,6 @@ const createVehicle = async(req: Request, res: Response)=>{
   
   try{
     const result = await vehicleServices.createVehicle(req.body);
-    console.log(result.rows[0])
     res.status(201).json({
       success: true,
       message: "Vehicle created successfully",
@@ -108,15 +107,15 @@ const updateSingleVehicle = async(req: Request, res: Response)=>{
 const deleteVehicle = async(req: Request, res: Response)=>{
   const id = req.params.vehicleId;
   try{
-    const result = await vehicleServices.deleteVehicle(id as string);
+    await vehicleServices.deleteVehicle(id as string);
     res.status(200).json({
       success: true,
       message: 'Vehicle deleted successfully'
-    })
+    });
   }catch(err:any){
     res.status(500).json({
       success: false,
-      message: "Vehicle couldn't update",
+      message: err.message,
     });
   }
 }

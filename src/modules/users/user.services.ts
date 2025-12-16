@@ -29,7 +29,25 @@ const updateUser = async(name:string, email: string, phone: string, role: string
 }
 
 const deleteUser = async(id:string)=>{
-  const result = await pool.query(`DELETE FROM users WHERE id=$1`, [id]);
+  const activeBooking = await pool.query(
+    `SELECT 1 FROM bookings WHERE customer_id=$1 AND status='active' LIMIT 1`,
+    [id]
+  );
+
+  if(activeBooking.rows.length > 0){
+    throw new Error("User has active bookings and cannot be deleted");
+  }
+
+  await pool.query(`DELETE FROM bookings WHERE customer_id = $1`,[id]);
+
+  const result = await pool.query(
+    `DELETE FROM users WHERE id = $1 RETURNING id`,
+    [id]
+  );
+
+  if(result.rows.length === 0){
+    throw new Error("User not found");
+  }
   return result;
 }
 

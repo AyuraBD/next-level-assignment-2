@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import initDB from "./config/DB";
 import { userRoutes } from "./modules/users/user.routes";
 import { authRoutes } from "./modules/auth/auth.routes";
@@ -11,21 +11,25 @@ app.use(express.json());
 
 initDB();
 
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to shohoz shorol assignment.');
 });
 
-// User CRUD
 app.use('/api/v1', userRoutes);
 
-// Vehicles CRUD
 app.use('/api/v1', vehicleRouter);
 
-// Bookings CRUD
 app.use('/api/v1', bookingRoutes);
 
-// User login
 app.use('/api/v1', authRoutes);
+
+app.use((req: Request, res: Response)=>{
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+    path: req.path,
+  });
+});
 
 
 export default app;

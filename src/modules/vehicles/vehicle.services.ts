@@ -34,7 +34,25 @@ const updateSingleVehicle = async(vehicle_name:string, type:string, registration
 };
 
 const deleteVehicle = async(id:string)=>{
-  const result = await pool.query(`DELETE FROM vehicles WHERE id=$1`, [id]);
+  const activeBooking = await pool.query(
+    `SELECT 1 FROM bookings WHERE vehicle_id=$1 AND status='active' LIMIT 1`,
+    [id]
+  );
+
+  if((activeBooking.rowCount ?? 0) > 0){
+    throw new Error("Vehicle has active bookings and cannot be deleted");
+  };
+
+  await pool.query(`DELETE FROM bookings WHERE vehicle_id = $1`,[id]);
+
+  const result = await pool.query(
+    `DELETE FROM vehicles WHERE id = $1 RETURNING id`,
+    [id]
+  );
+
+  if(result.rows.length === 0){
+    throw new Error("vehicle not found");
+  }
   return result;
 }
 

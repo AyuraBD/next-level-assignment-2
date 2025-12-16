@@ -12,6 +12,6 @@ router.get('/users', authAdmin('admin'), userController.getUsers);
 
 router.put('/users/:userId', auth(), canUpdate(), userController.updateUser);
 
-router.delete('users/:userId', userController.deleteUser);
+router.delete('/users/:userId', authAdmin('admin'), userController.deleteUser);
 
 export const userRoutes = router;
